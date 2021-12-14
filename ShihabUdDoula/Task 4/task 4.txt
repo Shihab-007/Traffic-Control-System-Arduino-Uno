@@ -1,0 +1,138 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <stdbool.h>
+
+#define carred 100
+#define caryellow 101
+#define cargreen 110
+#define pedRed 111
+#define pedGreen 112
+
+int carState;
+
+
+int pedState;
+
+bool buttonState;
+
+void crossButton ()
+{
+    int button;
+    printf(" Enter 1 for pressed button and 0 for non pressed button\n\n");
+    scanf("%d", &button);
+     if (button == 1)
+     {
+         buttonState = true;
+     }
+     else
+     {
+         buttonState = false;
+     }
+}
+void* carLine  ( void* arg)
+{
+    switch (carState)
+    {
+        case carred:
+            printf("CarRed is on\n");
+            printf ("CarYellow is off\n");
+            printf ("CarGreen is off \n\n");
+
+
+            carState = caryellow;
+        break;
+
+       case caryellow:
+
+            printf("CarRed is off \n");
+            printf ("CarYellow is on\n");
+            printf ("CarGreen is off \n\n");
+
+            carState = cargreen;
+
+        break;
+
+		case cargreen:
+
+            printf("CarRed is off\n");
+            printf ("CarYellow is off\n");
+            printf ("CarGreen is on\n\n");
+            carState = carred;
+
+        break;
+
+       default:
+        break;
+
+
+    }
+}
+void* pedLine ( void* arg)
+{
+    switch (pedState)
+    {
+        case pedRed:
+
+            printf("PedRED is on\n");
+            printf ("PedGREEN is off\n");
+
+            pedState = pedGreen;
+        break;
+
+        case pedGreen:
+
+            printf("PedRED is off \n");
+             printf ("PedGREEN is on \n");
+
+
+            pedState = pedRed;
+        break;
+
+        default:
+        break;
+    }
+}
+
+int main(void)
+{
+    pthread_t carTraffic, pedTraffic; // declaration
+
+    for (;;)
+    {
+    crossButton();
+    if(buttonState == true)
+        {
+            carState = carred;
+            pedState = pedGreen;
+
+            pthread_create(&pedTraffic, NULL, pedLine, (void*) NULL);
+            pthread_create(&carTraffic, NULL, carLine, (void*) NULL);
+            pthread_join(carTraffic, NULL);
+            pthread_join(pedTraffic, NULL);
+            printf("\n\n -------------------------- \n\n");
+
+
+        }
+
+    else
+        {
+
+            if ( carState == cargreen)
+            {
+                pedState = pedRed;
+            }
+
+            pthread_create(&pedTraffic, NULL, pedLine, (void*) NULL);
+            pthread_create(&carTraffic, NULL, carLine, (void*) NULL);
+            pthread_join(carTraffic, NULL);
+            pthread_join(pedTraffic, NULL);
+            printf("\n\n -------------------------- \n\n");
+
+        }
+
+    }
+
+
+    return 0;
+}
