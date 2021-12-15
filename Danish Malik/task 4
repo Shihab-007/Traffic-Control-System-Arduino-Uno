@@ -1,0 +1,203 @@
+int green=8; 
+int yellow=7;
+int red=5;
+int ped_green=3;
+int ped_red=4;
+int button_ped=2;
+int button_bus=6;
+int lag=2000; 
+int status=0;
+int i=0;
+int j=0;
+const int redstate=2;
+const int yellowstate=1;
+const int greenstate=0;
+const int ped_redstate=3;
+const int ped_greenstate=4;
+int currentstate=0;
+
+void setup() 
+{
+  Serial.begin(9600);
+  pinMode(green, OUTPUT);
+  pinMode(yellow, OUTPUT);
+  pinMode(red, OUTPUT);
+  pinMode(ped_green, OUTPUT);
+  pinMode(ped_red, OUTPUT);
+   pinMode(button_bus, INPUT);
+  pinMode(button_ped, INPUT);
+   
+}
+
+void loop()
+{
+  int button_bus_pressed=0;
+  int button_ped_pressed=0;
+  
+  digitalWrite(ped_red,HIGH);
+ // digitalWrite(green,HIGH);
+  Serial.println("Turn pedestrien red on ");
+  
+  switch(currentstate)
+  {
+  
+   case greenstate:
+  
+    digitalWrite(green,HIGH);
+   
+    for(i=0;i<=100;i++)
+    {
+      
+     delay(50); 
+      button_bus_pressed=digitalRead(button_bus);
+      button_ped_pressed=digitalRead(button_ped);
+      Serial.println(button_bus_pressed);
+      Serial.println(button_ped_pressed);
+  
+    if(button_ped_pressed==1 && button_bus_pressed==1)
+    {
+      
+     currentstate=4;
+      Serial.println("pedestrienlight become green");
+      digitalWrite(ped_green,0);
+      digitalWrite(green,0);
+      for(int k=0;k<2;k++)//for blinking
+        {
+        digitalWrite(yellow,1);
+          delay(600);
+        digitalWrite(yellow,0);
+          delay(300);
+        }
+     // digitalWrite(ped_red,0);
+      break;
+      
+    }else if(button_ped_pressed==1 && button_bus_pressed==0)
+    {
+      
+     currentstate=4;
+      Serial.println("pedestrienlight become green");
+      digitalWrite(ped_green,0);
+      digitalWrite(green,0);
+      for(int i=0;i<2;i++)//for blinking
+        {
+        digitalWrite(yellow,1);
+          delay(600);
+        digitalWrite(yellow,0);
+          delay(300);
+        }
+      //delay(5000);
+      //digitalWrite(ped_red,0);
+     
+      break; 
+    }
+      
+      else if(i==100)
+    {
+     currentstate=1;
+      digitalWrite(green,0);
+      break;
+      
+    }
+      else if(button_ped_pressed==0 && button_bus_pressed==1)
+    {
+        
+     currentstate=1;
+     Serial.println("pedestrienlight become red");
+     digitalWrite(green,0);
+      break;
+      
+    }
+  
+   }//for loop braket
+
+  
+  digitalWrite(red,LOW);
+    break;
+ 
+    
+    case yellowstate:
+    digitalWrite(yellow,1);
+    delay(1000);
+    currentstate=2;
+    for(int j=0;j<=2;j++)
+        {
+        digitalWrite(yellow,1);
+          delay(600);
+        digitalWrite(yellow,0);
+          delay(300);
+        }
+    break;
+    
+    case redstate: 
+    
+    digitalWrite(green,0);
+    digitalWrite(red,1);
+    
+    for( j=0;j<=100;j++)
+    {
+      delay(50);
+      if(digitalRead(button_ped)==1)
+        
+      {
+        
+       digitalWrite(green,0);
+        //digitalWrite(red,1);
+        currentstate=4;
+        break; 
+      }//if statement block
+      else if(j == 100)
+      {
+          digitalWrite(red,0);  
+          digitalWrite(yellow,1);
+       
+        for(int i=0;i<=2;i++)
+        {
+        digitalWrite(yellow,1);
+          delay(600);
+        digitalWrite(yellow,0);
+          delay(300);
+        }
+        currentstate=0;
+       
+        break;
+        
+        
+      }
+      
+    }//brackets of forloop
+    break;
+    
+    case ped_greenstate:
+    
+    digitalWrite(red,HIGH);
+    digitalWrite(green,LOW);
+    
+    for(int k=0;k<=2;k++)//for blinking
+    {
+    digitalWrite(ped_red,HIGH);
+    delay(600);
+    digitalWrite(ped_red,LOW);
+    delay(350);
+    }
+
+    
+    digitalWrite(ped_green,HIGH);
+    delay(4000);
+       for(int l=0;l<=2;l++)
+    {
+    digitalWrite(ped_green,HIGH);
+    delay(600);
+    digitalWrite(ped_green,LOW);
+    delay(300);
+    }
+    currentstate=3;
+    break;
+    
+    case ped_redstate:
+    digitalWrite(ped_green,LOW);
+    digitalWrite(ped_red,HIGH);
+    currentstate=2;
+    break;
+  
+  }//switch bracket  
+}//void loop braket
